@@ -35,6 +35,19 @@ export function CardImage({ src, alt, className = '' }: CardImageProps) {
   );
 }
 
+interface CardHeaderProps {
+  children: ReactNode;
+  className?: string;
+}
+
+export function CardHeader({ children, className = '' }: CardHeaderProps) {
+  return (
+    <div className={`px-6 py-4 border-b dark:border-gray-700 ${className}`}>
+      {children}
+    </div>
+  );
+}
+
 interface CardContentProps {
   children: ReactNode;
   className?: string;
@@ -89,5 +102,18 @@ export function CardPrice({ price, className = '' }: CardPriceProps) {
         minimumFractionDigits: 0,
       }).format(price)}
     </p>
+  );
+}
+
+interface CardFooterProps {
+  children: ReactNode;
+  className?: string;
+}
+
+export function CardFooter({ children, className = '' }: CardFooterProps) {
+  return (
+    <div className={`px-6 py-4 border-t dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50 ${className}`}>
+      {children}
+    </div>
   );
 }

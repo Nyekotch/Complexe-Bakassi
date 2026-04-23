@@ -1,12 +1,36 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight, UtensilsCrossed, Wine, Car } from 'lucide-react';
 import { config } from '@/data/config';
-import Card, { CardContent, CardTitle, CardDescription, CardImage } from '@/components/Card';
+import Card, { CardContent, CardTitle, CardDescription, CardImage, CardHeader, CardFooter } from '@/components/Card';
 import { useState, useEffect } from 'react';
 import heroImage from '@/assets/imagesComplexe/img1.png';
 import heroImage1 from '@/assets/imagesComplexe/img2.png';
 import restaurantImage from '@/assets/imagesRestaurant/resto1.jpeg';
 import laverieImage from '@/assets/imagesLaverie/lav1.png';
+
+// Fonction pour vérifier si l'établissement est ouvert
+function isOpen(): boolean {
+  const now = new Date();
+  const days = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
+  const currentDay = days[now.getDay()];
+  const hoursForDay = config.hours[currentDay as keyof typeof config.hours];
+  
+  if (!hoursForDay) return false;
+  
+  const [openTime, closeTime] = hoursForDay.split(' - ').map(time => {
+    const [hours, minutes] = time.split(':').map(Number);
+    return hours * 60 + minutes;
+  });
+  
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+  
+  // Gérer le cas où l'heure de fermeture est après minuit (00:00)
+  if (closeTime < openTime) {
+    return currentMinutes >= openTime || currentMinutes < closeTime;
+  }
+  
+  return currentMinutes >= openTime && currentMinutes < closeTime;
+}
 
 
 export default function Home() {
@@ -17,6 +41,7 @@ export default function Home() {
   ];
 
   const [currentImage, setCurrentImage] = useState(0);
+  const [isCurrentlyOpen, setIsCurrentlyOpen] = useState(isOpen());
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -25,6 +50,15 @@ export default function Home() {
 
     return () => clearInterval(interval);
   }, [images.length]);
+
+  // Mettre à jour le statut d'ouverture toutes les minutes
+  useEffect(() => {
+    const statusInterval = setInterval(() => {
+      setIsCurrentlyOpen(isOpen());
+    }, 60000);
+
+    return () => clearInterval(statusInterval);
+  }, []);
 
   const services: Array<{
     id: string;
@@ -125,6 +159,23 @@ export default function Home() {
             {services.map((service) => (
               <Link key={service.id} to={service.link}>
                 <Card className="h-full hover:shadow-xl transition-shadow max-h-96 flex flex-col">
+                  <CardHeader className="flex-shrink-0">
+                    <div className="flex items-center justify-between w-full">
+                      <div className="flex items-center space-x-3">
+                        <div className={`inline-flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br ${service.color} text-white`}>
+                          {service.icon}
+                        </div>
+                        <CardTitle className="text-xl mb-0">{service.title}</CardTitle>
+                      </div>
+                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold ${
+                        isCurrentlyOpen 
+                          ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' 
+                          : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                      }`}>
+                        {isCurrentlyOpen ? 'Ouvert' : 'Fermé'}
+                      </span>
+                    </div>
+                  </CardHeader>
                   {service.images && service.images.length > 0 && (
                     <CardImage 
                       src={service.images[0]} 
@@ -132,19 +183,17 @@ export default function Home() {
                       className="h-48 flex-shrink-0"
                     />
                   )}
-                  <CardContent className="text-center p-1 flex-grow flex flex-col justify-center">
-                    <div className={`inline-flex items-center justify-center w-14 h-14 rounded-full bg-gradient-to-br ${service.color} text-white mb-4`}>
-                      {service.icon}
-                    </div>
-                    <CardTitle className="text-xl mb-2">{service.title}</CardTitle>
+                  <CardContent className="flex-grow">
                     <CardDescription className="text-sm">
                       {service.description}
                     </CardDescription>
-                    <div className={`inline-flex items-center justify-center space-x-2 text-secondary-200 dark:text-secondary-300 font-medium`}>
-                      <span>En savoir plus</span>
-                      <ArrowRight size={16} className="ml-2" />
-                    </div>
                   </CardContent>
+                  <CardFooter className="flex-shrink-0">
+                    <div className="flex items-center justify-center space-x-2 text-secondary-500 dark:text-secondary-400 font-medium w-full">
+                      <span>En savoir plus</span>
+                      <ArrowRight size={16} />
+                    </div>
+                  </CardFooter>
                 </Card>
               </Link>
             ))}
