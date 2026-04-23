@@ -52,10 +52,10 @@ export default function Navbar() {
           <div className="hidden md:flex items-center space-x-4">
             <a
               href={`tel:${config.phone}`}
-              className="flex items-center space-x-1 text-sm text-gray-600 dark:text-gray-400 hover:text-secondary-500"
+              className="flex items-center text-gray-600 dark:text-gray-400 hover:text-secondary-500"
+              aria-label="Appeler"
             >
-              <Phone size={16} />
-              <span>{config.phone}</span>
+              <Phone size={20} />
             </a>
           </div>
 

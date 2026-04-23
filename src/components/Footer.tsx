@@ -134,7 +134,7 @@ export default function Footer() {
             </ul>
 
             {/* Hours */}
-            <div className="mt-4">
+            {/* <div className="mt-4">
               <h4 className="text-sm font-semibold mb-2">Horaires</h4>
               <ul className="text-sm text-gray-400 space-y-1">
                 {Object.entries(config.hours).map(([day, hours]) => (
@@ -144,7 +144,7 @@ export default function Footer() {
                   </li>
                 ))}
               </ul>
-            </div>
+            </div> */}
           </div>
         </div>
 
